@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Tracker Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Leave Tracker Form</h2>
+        <form id="leaveForm">
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="type">Leave Type:</label>
+                <select id="type" name="type" required>
+                    <option value="Casual">Casual</option>
+                    <option value="Sick">Sick</option>
+                    <option value="Earned">Earned</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="days">Days Used:</label>
+                <input type="number" id="days" name="days" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes:</label>
+                <textarea id="notes" name="notes" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <button type="button" onclick="addLeaveRecord()">Submit</button>
+            </div>
+        </form>
+
+        <h3>Leave Records</h3>
+        <table id="leaveTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Days Used</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Leave records will be added here -->
+            </tbody>
+        </table>
+
+        <div class="summary">
+            <h3>Leave Summary</h3>
+            <p><strong>Total Casual Leaves:</strong> <span id="totalCasual">12</span></p>
+            <p><strong>Total Sick Leaves:</strong> <span id="totalSick">10</span></p>
+            <p><strong>Total Earned Leaves:</strong> <span id="totalEarned">5</span></p>
+            <p><strong>Available Casual Leaves:</strong> <span id="availableCasual">12</span></p>
+            <p><strong>Available Sick Leaves:</strong> <span id="availableSick">10</span></p>
+            <p><strong>Available Earned Leaves:</strong> <span id="availableEarned">5</span></p>
+        </div>
+    </div>
+
+    <script>
+        let totalCasual = 12;
+        let totalSick = 10;
+        let totalEarned = 5;
+
+        let availableCasual = totalCasual;
+        let availableSick = totalSick;
+        let availableEarned = totalEarned;
+
+        function updateSummary() {
+            document.getElementById('availableCasual').textContent = availableCasual;
+            document.getElementById('availableSick').textContent = availableSick;
+            document.getElementById('availableEarned').textContent = availableEarned;
+        }
+
+        function addLeaveRecord() {
+            const date = document.getElementById('date').value;
+            const type = document.getElementById('type').value;
+            const days = parseInt(document.getElementById('days').value, 10);
+            const notes = document.getElementById('notes').value;
+
+            if (date && type && days) {
+                if (
+                    (type === 'Casual' && days > availableCasual) ||
+                    (type === 'Sick' && days > availableSick) ||
+                    (type === 'Earned' && days > availableEarned)
+                ) {
+                    alert('Not enough leave balance for the selected type.');
+                    return;
+                }
+
+                const table = document.getElementById('leaveTable').getElementsByTagName('tbody')[0];
+                const newRow = table.insertRow();
+
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
+                const cell3 = newRow.insertCell(2);
+                const cell4 = newRow.insertCell(3);
+
+                cell1.textContent = date;
+                cell2.textContent = type;
+                cell3.textContent = days;
+                cell4.textContent = notes;
+
+                if (type === 'Casual') availableCasual -= days;
+                if (type === 'Sick') availableSick -= days;
+                if (type === 'Earned') availableEarned -= days;
+
+                updateSummary();
+                document.getElementById('leaveForm').reset();
+            } else {
+                alert('Please fill out all required fields.');
+            }
+        }
+
+        updateSummary();
+    </script>
+</body>
+</html>
